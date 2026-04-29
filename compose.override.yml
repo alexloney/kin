@@ -1,4 +1,21 @@
 services:
   api:
+    build:
+      target: development
+    command: air -c .air.toml
     environment:
       GO_ENV: development
+    volumes:
+      - ./apps/api:/app
+      - go-mod-cache:/go/pkg/mod
+      - go-build-cache:/root/.cache/go-build
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  go-mod-cache:
+  go-build-cache:

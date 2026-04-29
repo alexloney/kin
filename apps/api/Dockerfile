@@ -1,14 +1,26 @@
-FROM golang:1.22-alpine AS build
+FROM golang:1.22-alpine AS base
 
 WORKDIR /app
 
 COPY go.mod ./
 RUN go mod download
 
+FROM base AS development
+
+RUN go install github.com/air-verse/air@v1.52.3
+
+COPY . .
+
+EXPOSE 8080
+
+CMD ["air", "-c", ".air.toml"]
+
+FROM base AS build
+
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o /kin-api ./...
 
-FROM alpine:3.20
+FROM alpine:3.20 AS runtime
 
 WORKDIR /app
 

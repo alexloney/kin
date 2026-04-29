@@ -21,6 +21,7 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
+
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{
 			"message": "kin api is running",
