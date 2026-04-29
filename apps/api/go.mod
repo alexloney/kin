@@ -1,4 +1,4 @@
-module github.com/aloney/kin/apps/api
+module github.com/alexloney/kin/apps/api
 
 go 1.22.2
 

@@ -3,7 +3,7 @@ tmp_dir = "tmp"
 
 [build]
 bin = "./tmp/kin-api"
-cmd = "go build -o ./tmp/kin-api ."
+cmd = "go build -o ./tmp/kin-api ./cmd/api"
 delay = 500
 exclude_dir = ["tmp"]
 exclude_regex = ["_test\\.go"]

@@ -2,7 +2,7 @@ FROM golang:1.22-alpine AS base
 
 WORKDIR /app
 
-COPY go.mod ./
+COPY go.mod go.sum ./
 RUN go mod download
 
 FROM base AS development
@@ -18,7 +18,8 @@ CMD ["air", "-c", ".air.toml"]
 FROM base AS build
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o /kin-api ./...
+# RUN CGO_ENABLED=0 GOOS=linux go build -o /kin-api ./...
+RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /kin-api ./cmd/api
 
 FROM alpine:3.20 AS runtime
 
