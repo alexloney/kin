@@ -20,6 +20,16 @@ func main() {
 		port = "8080"
 	}
 
+	db, err := openDB()
+	if err != nil {
+		log.Fatalf("database: %v", err)
+	}
+	defer db.Close()
+
+	if err := runMigrations(db); err != nil {
+		log.Fatalf("migrations: %v", err)
+	}
+
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
