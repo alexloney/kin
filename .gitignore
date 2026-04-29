@@ -1,0 +1,5 @@
+# environment
+.env
+
+# Go build artefacts
+apps/api/tmp/
