@@ -51,8 +51,11 @@ services:
       DB_USER: ${MYSQL_USER}
       DB_PASSWORD: ${MYSQL_PASSWORD}
       REDIS_ADDR: redis:6379
+      GOOGLE_APPLICATION_CREDENTIALS: /app/firebase-service-account.json
     ports:
       - "8080:8080"
+    volumes:
+      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
     depends_on:
       mysql:
         condition: service_healthy

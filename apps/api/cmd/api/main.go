@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/alexloney/kin/apps/api/internal/cache"
 	"github.com/alexloney/kin/apps/api/internal/db"
+	firebaseapp "github.com/alexloney/kin/apps/api/internal/firebase"
 )
 
 type statusResponse struct {
@@ -41,6 +43,10 @@ func main() {
 		log.Fatalf("redis: %v", err)
 	}
 	defer redisClient.Close()
+
+	if err := firebaseapp.Initialize(context.Background()); err != nil {
+		log.Fatalf("firebase: %v", err)
+	}
 
 	// Set up the HTTP server and routes
 	mux := http.NewServeMux()
