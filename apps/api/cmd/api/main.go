@@ -44,20 +44,26 @@ func main() {
 	}
 	defer redisClient.Close()
 
-	if err := firebaseapp.Initialize(context.Background()); err != nil {
+	firebaseAuth, err := firebaseapp.InitializeAuthClient(context.Background())
+	if err != nil {
 		log.Fatalf("firebase: %v", err)
 	}
 
 	// Set up the HTTP server and routes
 	mux := http.NewServeMux()
+	registerHealthRoutes(mux)
+
+	protected := http.NewServeMux()
 
 	// Root endpoint for basic health check - replace in the future
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	protected.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{
 			"message": "kin api is running",
 		})
 	})
-	registerHealthRoutes(mux)
+	
+	registerMeRoutes(protected)
+	mux.Handle("/", authMiddleware(firebaseAuth)(protected))
 
 	// Start the HTTP server
 	server := &http.Server{

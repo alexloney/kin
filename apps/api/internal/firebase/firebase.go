@@ -7,29 +7,31 @@ import (
 	"os"
 
 	firebase "firebase.google.com/go/v4"
+	fbauth "firebase.google.com/go/v4/auth"
 	"google.golang.org/api/option"
 )
 
-func Initialize(ctx context.Context) error {
+func InitializeAuthClient(ctx context.Context) (*fbauth.Client, error) {
 	credentialsFile := credentialsPath()
 	if credentialsFile == "" {
-		return fmt.Errorf("firebase credentials path is not configured")
+		return nil, fmt.Errorf("firebase credentials path is not configured")
 	}
 
 	opt := option.WithCredentialsFile(credentialsFile)
 
 	app, err := firebase.NewApp(ctx, nil, opt)
 	if err != nil {
-		return fmt.Errorf("initialize app: %w", err)
+		return nil, fmt.Errorf("initialize app: %w", err)
 	}
 
-	if _, err := app.Auth(ctx); err != nil {
-		return fmt.Errorf("initialize auth client: %w", err)
+	authClient, err := app.Auth(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("initialize auth client: %w", err)
 	}
 
 	log.Println("firebase connection established")
 
-	return nil
+	return authClient, nil
 }
 
 func credentialsPath() string {
