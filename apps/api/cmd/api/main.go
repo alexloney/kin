@@ -18,42 +18,42 @@ type statusResponse struct {
 }
 
 func main() {
+
+	// Obtain the port that we will host the API on
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
+	// Open a connection to the database and run migrations
 	database, err := db.OpenDB()
 	if err != nil {
 		log.Fatalf("database: %v", err)
 	}
 	defer database.Close()
-
 	if err := db.RunMigrations(database); err != nil {
 		log.Fatalf("migrations: %v", err)
 	}
 
+	// Open a connection to Redis
 	redisClient, err := cache.OpenRedis()
 	if err != nil {
 		log.Fatalf("redis: %v", err)
 	}
 	defer redisClient.Close()
 
+	// Set up the HTTP server and routes
 	mux := http.NewServeMux()
 
+	// Root endpoint for basic health check - replace in the future
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{
 			"message": "kin api is running",
 		})
 	})
-	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, http.StatusOK, statusResponse{
-			Status:    "ok",
-			Service:   "kin-api",
-			Timestamp: time.Now().UTC(),
-		})
-	})
+	registerHealthRoutes(mux)
 
+	// Start the HTTP server
 	server := &http.Server{
 		Addr:              ":" + port,
 		Handler:           loggingMiddleware(mux),
